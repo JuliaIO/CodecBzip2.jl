@@ -5,6 +5,14 @@ struct Bzip2Compression <: TranscodingStreams.Codec
     stream::BZStream
 end
 
+const DEFAULT_BLOCKSIZE100K = 9
+const DEFAULT_WORKFACTOR = 30
+
+"""
+    Bzip2Compression(;blocksize100k=$(DEFAULT_BLOCKSIZE100K), workfactor=$(DEFAULT_WORKFACTOR), verbosity=0)
+
+Create a bzip2 compression codec.
+"""
 function Bzip2Compression(;blocksize100k::Integer=8, workfactor::Integer=30, verbosity::Integer=0)
     if !(1 ≤ blocksize100k ≤ 9)
         throw(ArgumentError("blocksize100k must be within 1..9"))
@@ -23,6 +31,11 @@ end
 
 const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S} where S<:IO
 
+"""
+    Bzip2CompressionStream(stream::IO)
+
+Create a bzip2 compression stream by wrapping `stream`.
+"""
 function Bzip2CompressionStream(stream::IO)
     return TranscodingStream(Bzip2Compression(), stream)
 end
@@ -40,9 +53,7 @@ function TranscodingStreams.process(codec::Bzip2Compression, input::Memory, outp
     code = compress!(stream, input.size > 0 ? BZ_RUN : BZ_FINISH)
     Δin = Int(input.size - stream.avail_in)
     Δout = Int(output.size - stream.avail_out)
-    if code == BZ_RUN_OK
-        return Δin, Δout, :ok
-    elseif code == BZ_FINISH_OK
+    if code == BZ_RUN_OK || code == BZ_FINISH_OK
         return Δin, Δout, :ok
     elseif code == BZ_STREAM_END
         return Δin, Δout, :end

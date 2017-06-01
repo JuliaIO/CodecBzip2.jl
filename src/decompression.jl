@@ -5,7 +5,15 @@ struct Bzip2Decompression <: TranscodingStreams.Codec
     stream::BZStream
 end
 
+"""
+    Bzip2Decompression(;small=false, verbosity=0)
+
+Create a bzip2 decompression codec.
+"""
 function Bzip2Decompression(;small::Bool=false, verbosity::Integer=0)
+    if !(0 ≤ verbosity ≤ 4)
+        throw(ArgumentError("verbosity must be within 0..4"))
+    end
     stream = BZStream()
     code = decompress_init!(stream, verbosity, small)
     if code != BZ_OK
@@ -16,6 +24,11 @@ end
 
 const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S} where S<:IO
 
+"""
+    Bzip2DecompressionStream(stream::IO)
+
+Create a bzip2 decompression stream by wrapping `stream`.
+"""
 function Bzip2DecompressionStream(stream::IO)
     return TranscodingStream(Bzip2Decompression(), stream)
 end
