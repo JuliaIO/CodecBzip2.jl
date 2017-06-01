@@ -1,5 +1,8 @@
 using CodecBzip2
 using Base.Test
+import TranscodingStreams: test_roundtrip_read, test_roundtrip_write
 
-# write your own tests here
-@test 1 == 2
+@testset "Bzip2 Codec" begin
+    test_roundtrip_read(Bzip2CompressionStream, Bzip2DecompressionStream)
+    test_roundtrip_write(Bzip2CompressionStream, Bzip2DecompressionStream)
+end
