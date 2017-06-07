@@ -1,7 +1,11 @@
-# CodecBzip2
+# CodecBzip2.jl
 
-[![Build Status](https://travis-ci.org/bicycle1885/CodecBzip2.jl.svg?branch=master)](https://travis-ci.org/bicycle1885/CodecBzip2.jl)
+[![TravisCI Status][travisci-img]][travisci-url]
+[![codecov.io][codecov-img]][codecov-url]
 
-[![Coverage Status](https://coveralls.io/repos/bicycle1885/CodecBzip2.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/bicycle1885/CodecBzip2.jl?branch=master)
+See [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
 
-[![codecov.io](http://codecov.io/github/bicycle1885/CodecBzip2.jl/coverage.svg?branch=master)](http://codecov.io/github/bicycle1885/CodecBzip2.jl?branch=master)
+[travisci-img]: https://travis-ci.org/bicycle1885/CodecBzip2.jl.jl.svg?branch=master
+[travisci-url]: https://travis-ci.org/bicycle1885/CodecBzip2.jl.jl
+[codecov-img]: http://codecov.io/github/bicycle1885/CodecBzip2.jl.jl/coverage.svg?branch=master
+[codecov-url]: http://codecov.io/github/bicycle1885/CodecBzip2.jl.jl?branch=master
