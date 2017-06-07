@@ -3,6 +3,9 @@
 
 struct Bzip2Compression <: TranscodingStreams.Codec
     stream::BZStream
+    blocksize100k::Int
+    workfactor::Int
+    verbosity::Int
 end
 
 const DEFAULT_BLOCKSIZE100K = 9
@@ -21,15 +24,10 @@ function Bzip2Compression(;blocksize100k::Integer=8, workfactor::Integer=30, ver
     elseif !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    stream = BZStream()
-    code = compress_init!(stream, blocksize100k, verbosity, workfactor)
-    if code != BZ_OK
-        bzerror(stream, code)
-    end
-    return Bzip2Compression(stream)
+    return Bzip2Compression(BZStream(), blocksize100k, workfactor, verbosity)
 end
 
-const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S} where S<:IO
+const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S}
 
 """
     Bzip2CompressionStream(stream::IO)
@@ -43,6 +41,28 @@ end
 
 # Methods
 # -------
+
+function TranscodingStreams.initialize(codec::Bzip2Compression)
+    code = compress_init!(codec.stream, codec.blocksize100k, codec.verbosity, codec.workfactor)
+    if code != BZ_OK
+        bzerror(codec.stream, code)
+    end
+    finalizer(codec.stream, free_compress!)
+end
+
+function TranscodingStreams.finalize(codec::Bzip2Compression)
+    free_compress!(codec.stream)
+end
+
+function free_compress!(stream::BZStream)
+    if stream.state != C_NULL
+        code = compress_end!(stream)
+        if code != BZ_OK
+            bzerror(stream, code)
+        end
+    end
+    return
+end
 
 function TranscodingStreams.process(codec::Bzip2Compression, input::Memory, output::Memory)
     stream = codec.stream
@@ -60,12 +80,4 @@ function TranscodingStreams.process(codec::Bzip2Compression, input::Memory, outp
     else
         bzerror(stream, code)
     end
-end
-
-function TranscodingStreams.finalize(codec::Bzip2Compression)
-    code = compress_end!(codec.stream)
-    if code != BZ_OK
-        bzerror(stream, code)
-    end
-    return
 end

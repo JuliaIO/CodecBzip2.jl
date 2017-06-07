@@ -3,6 +3,8 @@
 
 struct Bzip2Decompression <: TranscodingStreams.Codec
     stream::BZStream
+    small::Bool
+    verbosity::Int
 end
 
 """
@@ -14,15 +16,10 @@ function Bzip2Decompression(;small::Bool=false, verbosity::Integer=0)
     if !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    stream = BZStream()
-    code = decompress_init!(stream, verbosity, small)
-    if code != BZ_OK
-        bzerror(stream, code)
-    end
-    return Bzip2Decompression(stream)
+    return Bzip2Decompression(BZStream(), small, verbosity)
 end
 
-const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S} where S<:IO
+const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S}
 
 """
     Bzip2DecompressionStream(stream::IO)
@@ -36,6 +33,28 @@ end
 
 # Methods
 # -------
+
+function TranscodingStreams.initialize(codec::Bzip2Decompression)
+    code = decompress_init!(codec.stream, codec.verbosity, codec.small)
+    if code != BZ_OK
+        bzerror(codec.stream, code)
+    end
+    finalizer(codec.stream, free_decompress!)
+end
+
+function TranscodingStreams.finalize(codec::Bzip2Decompression)
+    free_decompress!(codec.stream)
+end
+
+function free_decompress!(stream::BZStream)
+    if stream.state != C_NULL
+        code = decompress_end!(stream)
+        if code != BZ_OK
+            bzerror(stream, code)
+        end
+    end
+    return
+end
 
 function TranscodingStreams.process(codec::Bzip2Decompression, input::Memory, output::Memory)
     stream = codec.stream
@@ -53,12 +72,4 @@ function TranscodingStreams.process(codec::Bzip2Decompression, input::Memory, ou
     else
         bzerror(stream, code)
     end
-end
-
-function TranscodingStreams.finalize(codec::Bzip2Decompression)
-    code = decompress_end!(codec.stream)
-    if code != BZ_OK
-        bzerror(stream, code)
-    end
-    return
 end
