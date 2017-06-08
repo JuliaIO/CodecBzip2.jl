@@ -39,14 +39,14 @@ function TranscodingStreams.initialize(codec::Bzip2Decompression)
     if code != BZ_OK
         bzerror(codec.stream, code)
     end
-    finalizer(codec.stream, free_decompress!)
+    finalizer(codec.stream, safefree!)
 end
 
 function TranscodingStreams.finalize(codec::Bzip2Decompression)
-    free_decompress!(codec.stream)
+    safefree!(codec.stream)
 end
 
-function free_decompress!(stream::BZStream)
+function safefree!(stream::BZStream)
     if stream.state != C_NULL
         code = decompress_end!(stream)
         if code != BZ_OK
