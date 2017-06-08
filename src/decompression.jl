@@ -35,25 +35,20 @@ end
 # -------
 
 function TranscodingStreams.initialize(codec::Bzip2Decompression)
+    finalizer(codec.stream, safefree_decompress!)
+end
+
+function TranscodingStreams.finalize(codec::Bzip2Decompression)
+    safefree_decompress!(codec.stream)
+end
+
+function TranscodingStreams.startproc(codec::Bzip2Decompression, ::Symbol)
+    safefree_decompress!(codec.stream)
     code = decompress_init!(codec.stream, codec.verbosity, codec.small)
     if code != BZ_OK
         bzerror(codec.stream, code)
     end
-    finalizer(codec.stream, safefree!)
-end
-
-function TranscodingStreams.finalize(codec::Bzip2Decompression)
-    safefree!(codec.stream)
-end
-
-function safefree!(stream::BZStream)
-    if stream.state != C_NULL
-        code = decompress_end!(stream)
-        if code != BZ_OK
-            bzerror(stream, code)
-        end
-    end
-    return
+    return :ok
 end
 
 function TranscodingStreams.process(codec::Bzip2Decompression, input::Memory, output::Memory)
@@ -72,4 +67,14 @@ function TranscodingStreams.process(codec::Bzip2Decompression, input::Memory, ou
     else
         bzerror(stream, code)
     end
+end
+
+function safefree_decompress!(stream::BZStream)
+    if stream.state != C_NULL
+        code = decompress_end!(stream)
+        if code != BZ_OK
+            bzerror(stream, code)
+        end
+    end
+    return
 end
