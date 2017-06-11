@@ -17,6 +17,7 @@ import TranscodingStreams
 
     TranscodingStreams.test_roundtrip_read(Bzip2CompressionStream, Bzip2DecompressionStream)
     TranscodingStreams.test_roundtrip_write(Bzip2CompressionStream, Bzip2DecompressionStream)
+    TranscodingStreams.test_roundtrip_lines(Bzip2CompressionStream, Bzip2DecompressionStream)
     TranscodingStreams.test_roundtrip_transcode(Bzip2Compression, Bzip2Decompression)
 
     @test_throws ArgumentError Bzip2Compression(blocksize100k=10)
