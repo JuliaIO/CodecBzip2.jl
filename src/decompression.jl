@@ -8,11 +8,16 @@ struct Bzip2Decompression <: TranscodingStreams.Codec
 end
 
 """
-    Bzip2Decompression(;small=false, verbosity=0)
+    Bzip2Decompression(;small=false, verbosity=$(DEFAULT_VERBOSITY))
 
 Create a bzip2 decompression codec.
+
+Arguments
+---------
+- `small`: flag to activate an algorithm which uses less memory
+- `verbosity`: verbosity level (0..4)
 """
-function Bzip2Decompression(;small::Bool=false, verbosity::Integer=0)
+function Bzip2Decompression(;small::Bool=false, verbosity::Integer=DEFAULT_VERBOSITY)
     if !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
@@ -22,12 +27,12 @@ end
 const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S}
 
 """
-    Bzip2DecompressionStream(stream::IO)
+    Bzip2DecompressionStream(stream::IO; kwargs...)
 
-Create a bzip2 decompression stream by wrapping `stream`.
+Create a bzip2 decompression stream (see `Bzip2Decompression` for `kwargs`).
 """
-function Bzip2DecompressionStream(stream::IO)
-    return TranscodingStream(Bzip2Decompression(), stream)
+function Bzip2DecompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(Bzip2Decompression(;kwargs...), stream)
 end
 
 

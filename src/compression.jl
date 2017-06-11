@@ -10,13 +10,22 @@ end
 
 const DEFAULT_BLOCKSIZE100K = 9
 const DEFAULT_WORKFACTOR = 30
+const DEFAULT_VERBOSITY = 0
 
 """
-    Bzip2Compression(;blocksize100k=$(DEFAULT_BLOCKSIZE100K), workfactor=$(DEFAULT_WORKFACTOR), verbosity=0)
+    Bzip2Compression(;blocksize100k=$(DEFAULT_BLOCKSIZE100K), workfactor=$(DEFAULT_WORKFACTOR), verbosity=$(DEFAULT_VERBOSITY))
 
 Create a bzip2 compression codec.
+
+Arguments
+---------
+- `blocksize100k`: block size to be use for compression (1..9)
+- `workfactor`: amount of effort the standard algorithm will expend before resorting to the fallback (0..250)
+- `verbosity`: verbosity level (0..4)
 """
-function Bzip2Compression(;blocksize100k::Integer=8, workfactor::Integer=30, verbosity::Integer=0)
+function Bzip2Compression(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
+                           workfactor::Integer=DEFAULT_WORKFACTOR,
+                           verbosity::Integer=DEFAULT_VERBOSITY)
     if !(1 ≤ blocksize100k ≤ 9)
         throw(ArgumentError("blocksize100k must be within 1..9"))
     elseif !(0 ≤ workfactor ≤ 250)
@@ -30,12 +39,12 @@ end
 const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S}
 
 """
-    Bzip2CompressionStream(stream::IO)
+    Bzip2CompressionStream(stream::IO; kwargs...)
 
-Create a bzip2 compression stream by wrapping `stream`.
+Create a bzip2 compression stream (see `Bzip2Compression` for `kwargs`).
 """
-function Bzip2CompressionStream(stream::IO)
-    return TranscodingStream(Bzip2Compression(), stream)
+function Bzip2CompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(Bzip2Compression(;kwargs...), stream)
 end
 
 
