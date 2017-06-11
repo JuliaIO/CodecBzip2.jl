@@ -15,6 +15,9 @@ import TranscodingStreams
     write(stream, b"bar", TranscodingStreams.TOKEN_END)
     @test read(Bzip2DecompressionStream(IOBuffer(take!(buf)))) == b"foobar"
 
+    @test Bzip2CompressionStream <: TranscodingStreams.TranscodingStream
+    @test Bzip2DecompressionStream <: TranscodingStreams.TranscodingStream
+
     TranscodingStreams.test_roundtrip_read(Bzip2CompressionStream, Bzip2DecompressionStream)
     TranscodingStreams.test_roundtrip_write(Bzip2CompressionStream, Bzip2DecompressionStream)
     TranscodingStreams.test_roundtrip_lines(Bzip2CompressionStream, Bzip2DecompressionStream)

@@ -24,7 +24,7 @@ function Bzip2Decompression(;small::Bool=false, verbosity::Integer=DEFAULT_VERBO
     return Bzip2Decompression(BZStream(), small, verbosity)
 end
 
-const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S}
+const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S} where S<:IO
 
 """
     Bzip2DecompressionStream(stream::IO; kwargs...)

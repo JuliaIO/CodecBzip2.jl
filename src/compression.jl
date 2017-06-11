@@ -36,7 +36,7 @@ function Bzip2Compression(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
     return Bzip2Compression(BZStream(), blocksize100k, workfactor, verbosity)
 end
 
-const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S}
+const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S} where S<:IO
 
 """
     Bzip2CompressionStream(stream::IO; kwargs...)
