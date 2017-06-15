@@ -1,6 +1,8 @@
 # The libbz2 Interfaces
 # =====================
 
+include("../deps/deps.jl")
+
 mutable struct BZStream
     next_in::Ptr{UInt8}
     avail_in::Cint
@@ -26,8 +28,6 @@ function BZStream()
         C_NULL,
         C_NULL, C_NULL, C_NULL)
 end
-
-const libbz2 = "libbz2"
 
 # Action code
 const BZ_RUN              = Cint(0)
