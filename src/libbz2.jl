@@ -2,7 +2,6 @@
 # =====================
 
 include("../deps/deps.jl")
-const libbz2_calling_convention = is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl
 
 mutable struct BZStream
     next_in::Ptr{UInt8}
@@ -61,7 +60,7 @@ function compress_init!(stream::BZStream,
                         workfactor::Integer)
     return ccall(
         (:BZ2_bzCompressInit, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream}, Cint, Cint, Cint),
         stream, blocksize100k, verbosity, workfactor)
@@ -70,7 +69,7 @@ end
 function compress_end!(stream::BZStream)
     return ccall(
         (:BZ2_bzCompressEnd, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream},),
         stream)
@@ -79,7 +78,7 @@ end
 function compress!(stream::BZStream, action::Integer)
     return ccall(
         (:BZ2_bzCompress, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream}, Cint),
         stream, action)
@@ -92,7 +91,7 @@ end
 function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
     return ccall(
         (:BZ2_bzDecompressInit, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream}, Cint, Cint),
         stream, verbosity, small)
@@ -101,7 +100,7 @@ end
 function decompress_end!(stream::BZStream)
     return ccall(
         (:BZ2_bzDecompressEnd, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream},),
         stream)
@@ -110,7 +109,7 @@ end
 function decompress!(stream::BZStream)
     return ccall(
         (:BZ2_bzDecompress, libbz2),
-        libbz2_calling_convention,
+        is_windows() && Sys.WORD_SIZE==32 ? stdcall : cdecl,
         Cint,
         (Ref{BZStream},),
         stream)
