@@ -60,7 +60,7 @@ function compress_init!(stream::BZStream,
                         workfactor::Integer)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzCompressInit, libbz2),
+        ("BZ2_bzCompressInit@16", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream}, Cint, Cint, Cint),
@@ -77,7 +77,7 @@ end
 function compress_end!(stream::BZStream)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzCompressEnd, libbz2),
+        ("BZ2_bzCompressEnd@4", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream},),
@@ -94,7 +94,7 @@ end
 function compress!(stream::BZStream, action::Integer)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzCompress, libbz2),
+        ("BZ2_bzCompress@8", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream}, Cint),
@@ -115,7 +115,7 @@ end
 function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzDecompressInit, libbz2),
+        ("BZ2_bzDecompressInit@12", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream}, Cint, Cint),
@@ -132,7 +132,7 @@ end
 function decompress_end!(stream::BZStream)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzDecompressEnd, libbz2),
+        ("BZ2_bzDecompressEnd@4", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream},),
@@ -149,7 +149,7 @@ end
 function decompress!(stream::BZStream)
   if is_windows() && Sys.WORD_SIZE==32
     return ccall(
-        (:BZ2_bzDecompress, libbz2),
+        ("BZ2_bzDecompress@4", libbz2),
         stdcall,
         Cint,
         (Ref{BZStream},),
