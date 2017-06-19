@@ -2,6 +2,7 @@
 # =====================
 
 include("../deps/deps.jl")
+const WIN32 = is_windows() && Sys.WORD_SIZE==32
 
 mutable struct BZStream
     next_in::Ptr{UInt8}
@@ -58,7 +59,7 @@ function compress_init!(stream::BZStream,
                         blocksize100k::Integer,
                         verbosity::Integer,
                         workfactor::Integer)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzCompressInit@16", libbz2),
         stdcall,
@@ -75,7 +76,7 @@ function compress_init!(stream::BZStream,
 end
 
 function compress_end!(stream::BZStream)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzCompressEnd@4", libbz2),
         stdcall,
@@ -92,7 +93,7 @@ function compress_end!(stream::BZStream)
 end
 
 function compress!(stream::BZStream, action::Integer)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzCompress@8", libbz2),
         stdcall,
@@ -113,7 +114,7 @@ end
 # -------------
 
 function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzDecompressInit@12", libbz2),
         stdcall,
@@ -130,7 +131,7 @@ function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
 end
 
 function decompress_end!(stream::BZStream)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzDecompressEnd@4", libbz2),
         stdcall,
@@ -147,7 +148,7 @@ function decompress_end!(stream::BZStream)
 end
 
 function decompress!(stream::BZStream)
-  if is_windows() && Sys.WORD_SIZE==32
+  if WIN32
     return ccall(
         ("BZ2_bzDecompress@4", libbz2),
         stdcall,
