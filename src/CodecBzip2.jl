@@ -11,7 +11,8 @@ export
 import TranscodingStreams:
     TranscodingStreams,
     TranscodingStream,
-    Memory
+    Memory,
+    Error
 
 include("libbz2.jl")
 include("compression.jl")
