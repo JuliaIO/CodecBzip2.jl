@@ -7,6 +7,10 @@ struct Bzip2Decompression <: TranscodingStreams.Codec
     verbosity::Int
 end
 
+function Base.show(io::IO, codec::Bzip2Decompression)
+    print(io, summary(codec), "(small=$(codec.small), verbosity=$(codec.verbosity))")
+end
+
 """
     Bzip2Decompression(;small=false, verbosity=$(DEFAULT_VERBOSITY))
 

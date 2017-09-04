@@ -8,6 +8,10 @@ struct Bzip2Compression <: TranscodingStreams.Codec
     verbosity::Int
 end
 
+function Base.show(io::IO, codec::Bzip2Compression)
+    print(io, summary(codec), "(blocksize100k=$(codec.blocksize100k), workfactor=$(codec.workfactor), verbosity=$(codec.verbosity))")
+end
+
 const DEFAULT_BLOCKSIZE100K = 9
 const DEFAULT_WORKFACTOR = 30
 const DEFAULT_VERBOSITY = 0

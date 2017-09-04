@@ -12,7 +12,9 @@ import TranscodingStreams:
     TranscodingStreams,
     TranscodingStream,
     Memory,
-    Error
+    Error,
+    initialize,
+    finalize
 
 include("libbz2.jl")
 include("compression.jl")
