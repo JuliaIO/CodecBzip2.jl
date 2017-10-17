@@ -48,7 +48,8 @@ const Bzip2CompressorStream{S} = TranscodingStream{Bzip2Compressor,S} where S<:I
 Create a bzip2 compression stream (see `Bzip2Compressor` for `kwargs`).
 """
 function Bzip2CompressorStream(stream::IO; kwargs...)
-    return TranscodingStream(Bzip2Compressor(;kwargs...), stream)
+    x, y = splitkwargs(kwargs, (:blocksize100k, :workfactor, :verbosity))
+    return TranscodingStream(Bzip2Compressor(;x...), stream; y...)
 end
 
 
