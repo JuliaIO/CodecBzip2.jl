@@ -1,14 +1,14 @@
-# Compression Codec
-# =================
+# Compressor Codec
+# ================
 
-struct Bzip2Compression <: TranscodingStreams.Codec
+struct Bzip2Compressor <: TranscodingStreams.Codec
     stream::BZStream
     blocksize100k::Int
     workfactor::Int
     verbosity::Int
 end
 
-function Base.show(io::IO, codec::Bzip2Compression)
+function Base.show(io::IO, codec::Bzip2Compressor)
     print(io, summary(codec), "(blocksize100k=$(codec.blocksize100k), workfactor=$(codec.workfactor), verbosity=$(codec.verbosity))")
 end
 
@@ -17,7 +17,7 @@ const DEFAULT_WORKFACTOR = 30
 const DEFAULT_VERBOSITY = 0
 
 """
-    Bzip2Compression(;blocksize100k=$(DEFAULT_BLOCKSIZE100K), workfactor=$(DEFAULT_WORKFACTOR), verbosity=$(DEFAULT_VERBOSITY))
+    Bzip2Compressor(;blocksize100k=$(DEFAULT_BLOCKSIZE100K), workfactor=$(DEFAULT_WORKFACTOR), verbosity=$(DEFAULT_VERBOSITY))
 
 Create a bzip2 compression codec.
 
@@ -27,7 +27,7 @@ Arguments
 - `workfactor`: amount of effort the standard algorithm will expend before resorting to the fallback (0..250)
 - `verbosity`: verbosity level (0..4)
 """
-function Bzip2Compression(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
+function Bzip2Compressor(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
                            workfactor::Integer=DEFAULT_WORKFACTOR,
                            verbosity::Integer=DEFAULT_VERBOSITY)
     if !(1 ≤ blocksize100k ≤ 9)
@@ -37,25 +37,25 @@ function Bzip2Compression(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
     elseif !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    return Bzip2Compression(BZStream(), blocksize100k, workfactor, verbosity)
+    return Bzip2Compressor(BZStream(), blocksize100k, workfactor, verbosity)
 end
 
-const Bzip2CompressionStream{S} = TranscodingStream{Bzip2Compression,S} where S<:IO
+const Bzip2CompressorStream{S} = TranscodingStream{Bzip2Compressor,S} where S<:IO
 
 """
-    Bzip2CompressionStream(stream::IO; kwargs...)
+    Bzip2CompressorStream(stream::IO; kwargs...)
 
-Create a bzip2 compression stream (see `Bzip2Compression` for `kwargs`).
+Create a bzip2 compression stream (see `Bzip2Compressor` for `kwargs`).
 """
-function Bzip2CompressionStream(stream::IO; kwargs...)
-    return TranscodingStream(Bzip2Compression(;kwargs...), stream)
+function Bzip2CompressorStream(stream::IO; kwargs...)
+    return TranscodingStream(Bzip2Compressor(;kwargs...), stream)
 end
 
 
 # Methods
 # -------
 
-function TranscodingStreams.finalize(codec::Bzip2Compression)
+function TranscodingStreams.finalize(codec::Bzip2Compressor)
     if codec.stream.state != C_NULL
         code = compress_end!(codec.stream)
         if code != BZ_OK
@@ -65,7 +65,7 @@ function TranscodingStreams.finalize(codec::Bzip2Compression)
     return
 end
 
-function TranscodingStreams.startproc(codec::Bzip2Compression, ::Symbol, error::Error)
+function TranscodingStreams.startproc(codec::Bzip2Compressor, ::Symbol, error::Error)
     if codec.stream.state != C_NULL
         code = compress_end!(codec.stream)
         if code != BZ_OK
@@ -81,7 +81,7 @@ function TranscodingStreams.startproc(codec::Bzip2Compression, ::Symbol, error::
     return :ok
 end
 
-function TranscodingStreams.process(codec::Bzip2Compression, input::Memory, output::Memory, error::Error)
+function TranscodingStreams.process(codec::Bzip2Compressor, input::Memory, output::Memory, error::Error)
     stream = codec.stream
     stream.next_in = input.ptr
     stream.avail_in = input.size

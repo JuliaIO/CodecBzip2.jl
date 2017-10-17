@@ -1,18 +1,18 @@
-# Decompression Codec
-# ===================
+# Decompressor Codec
+# ==================
 
-struct Bzip2Decompression <: TranscodingStreams.Codec
+struct Bzip2Decompressor <: TranscodingStreams.Codec
     stream::BZStream
     small::Bool
     verbosity::Int
 end
 
-function Base.show(io::IO, codec::Bzip2Decompression)
+function Base.show(io::IO, codec::Bzip2Decompressor)
     print(io, summary(codec), "(small=$(codec.small), verbosity=$(codec.verbosity))")
 end
 
 """
-    Bzip2Decompression(;small=false, verbosity=$(DEFAULT_VERBOSITY))
+    Bzip2Decompressor(;small=false, verbosity=$(DEFAULT_VERBOSITY))
 
 Create a bzip2 decompression codec.
 
@@ -21,29 +21,29 @@ Arguments
 - `small`: flag to activate an algorithm which uses less memory
 - `verbosity`: verbosity level (0..4)
 """
-function Bzip2Decompression(;small::Bool=false, verbosity::Integer=DEFAULT_VERBOSITY)
+function Bzip2Decompressor(;small::Bool=false, verbosity::Integer=DEFAULT_VERBOSITY)
     if !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    return Bzip2Decompression(BZStream(), small, verbosity)
+    return Bzip2Decompressor(BZStream(), small, verbosity)
 end
 
-const Bzip2DecompressionStream{S} = TranscodingStream{Bzip2Decompression,S} where S<:IO
+const Bzip2DecompressorStream{S} = TranscodingStream{Bzip2Decompressor,S} where S<:IO
 
 """
-    Bzip2DecompressionStream(stream::IO; kwargs...)
+    Bzip2DecompressorStream(stream::IO; kwargs...)
 
-Create a bzip2 decompression stream (see `Bzip2Decompression` for `kwargs`).
+Create a bzip2 decompression stream (see `Bzip2Decompressor` for `kwargs`).
 """
-function Bzip2DecompressionStream(stream::IO; kwargs...)
-    return TranscodingStream(Bzip2Decompression(;kwargs...), stream)
+function Bzip2DecompressorStream(stream::IO; kwargs...)
+    return TranscodingStream(Bzip2Decompressor(;kwargs...), stream)
 end
 
 
 # Methods
 # -------
 
-function TranscodingStreams.finalize(codec::Bzip2Decompression)
+function TranscodingStreams.finalize(codec::Bzip2Decompressor)
     if codec.stream.state != C_NULL
         code = decompress_end!(codec.stream)
         if code != BZ_OK
@@ -53,7 +53,7 @@ function TranscodingStreams.finalize(codec::Bzip2Decompression)
     return
 end
 
-function TranscodingStreams.startproc(codec::Bzip2Decompression, ::Symbol, error::Error)
+function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error::Error)
     if codec.stream.state != C_NULL
         code = decompress_end!(codec.stream)
         if code != BZ_OK
@@ -69,7 +69,7 @@ function TranscodingStreams.startproc(codec::Bzip2Decompression, ::Symbol, error
     return :ok
 end
 
-function TranscodingStreams.process(codec::Bzip2Decompression, input::Memory, output::Memory, error::Error)
+function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, output::Memory, error::Error)
     stream = codec.stream
     stream.next_in = input.ptr
     stream.avail_in = input.size

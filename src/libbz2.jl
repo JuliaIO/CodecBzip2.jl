@@ -52,8 +52,8 @@ const BZ_OUTBUFF_FULL     = Cint(-8)
 const BZ_CONFIG_ERROR     = Cint(-9)
 
 
-# Compression
-# -----------
+# Compressor
+# ----------
 
 function compress_init!(stream::BZStream,
                         blocksize100k::Integer,
@@ -110,8 +110,8 @@ function compress!(stream::BZStream, action::Integer)
 end
 
 
-# Decompression
-# -------------
+# Decompressor
+# ------------
 
 function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
     if WIN32
