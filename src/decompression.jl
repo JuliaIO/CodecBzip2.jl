@@ -1,5 +1,5 @@
 # Decompressor Codec
-# ===================
+# ==================
 
 struct Bzip2Decompressor <: TranscodingStreams.Codec
     stream::BZStream

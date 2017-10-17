@@ -53,7 +53,7 @@ const BZ_CONFIG_ERROR     = Cint(-9)
 
 
 # Compressor
-# -----------
+# ----------
 
 function compress_init!(stream::BZStream,
                         blocksize100k::Integer,
@@ -111,7 +111,7 @@ end
 
 
 # Decompressor
-# -------------
+# ------------
 
 function decompress_init!(stream::BZStream, verbosity::Integer, small::Bool)
     if WIN32
