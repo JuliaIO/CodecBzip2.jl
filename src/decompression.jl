@@ -36,7 +36,8 @@ const Bzip2DecompressorStream{S} = TranscodingStream{Bzip2Decompressor,S} where 
 Create a bzip2 decompression stream (see `Bzip2Decompressor` for `kwargs`).
 """
 function Bzip2DecompressorStream(stream::IO; kwargs...)
-    return TranscodingStream(Bzip2Decompressor(;kwargs...), stream)
+    x, y = splitkwargs(kwargs, (:small, :verbosity))
+    return TranscodingStream(Bzip2Decompressor(;x...), stream; y...)
 end
 
 
