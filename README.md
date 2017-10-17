@@ -26,24 +26,24 @@ erat ex bibendum ipsum, sed varius ipsum ipsum vitae dui.
 """
 
 # Streaming API.
-stream = Bzip2CompressionStream(IOBuffer(text))
-for line in eachline(Bzip2DecompressionStream(stream))
+stream = Bzip2CompressorStream(IOBuffer(text))
+for line in eachline(Bzip2DecompressorStream(stream))
     println(line)
 end
 close(stream)
 
 # Array API.
-compressed = transcode(Bzip2Compression(), text)
+compressed = transcode(Bzip2Compressor, text)
 @assert sizeof(compressed) < sizeof(text)
-@assert transcode(Bzip2Decompression(), compressed) == Vector{UInt8}(text)
+@assert transcode(Bzip2Decompressor, compressed) == Vector{UInt8}(text)
 ```
 
 This package exports following codecs and streams:
 
 | Codec                | Stream                     |
 | -------------------- | -------------------------- |
-| `Bzip2Compression`   | `Bzip2CompressionStream`   |
-| `Bzip2Decompression` | `Bzip2DecompressionStream` |
+| `Bzip2Compressor`    | `Bzip2CompressorStream`    |
+| `Bzip2Decompressor`  | `Bzip2DecompressorStream`  |
 
 See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
 
