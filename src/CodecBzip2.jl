@@ -26,6 +26,10 @@ function splitkwargs(kwargs, keys)
     return hits, others
 end
 
+if !isdefined(Base, :Cvoid)
+    const Cvoid = Void
+end
+
 include("libbz2.jl")
 include("compression.jl")
 include("decompression.jl")
