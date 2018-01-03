@@ -15,11 +15,11 @@ mutable struct BZStream
     total_out_lo32::Cint
     total_out_hi32::Cint
 
-    state::Ptr{Void}
+    state::Ptr{Cvoid}
 
-    bzalloc::Ptr{Void}
-    bzfree::Ptr{Void}
-    opaque::Ptr{Void}
+    bzalloc::Ptr{Cvoid}
+    bzfree::Ptr{Cvoid}
+    opaque::Ptr{Cvoid}
 end
 
 function BZStream()

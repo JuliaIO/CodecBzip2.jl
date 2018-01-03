@@ -1,17 +1,21 @@
 using CodecBzip2
-using Base.Test
+if VERSION > v"0.7-"
+    using Test
+else
+    using Base.Test
+end
 import TranscodingStreams
 
 @testset "Bzip2 Codec" begin
     codec = Bzip2Compressor()
     @test codec isa Bzip2Compressor
-    @test ismatch(r"^CodecBzip2.Bzip2Compressor\(blocksize100k=\d+, workfactor=\d+, verbosity=\d+\)$", sprint(show, codec))
+    @test ismatch(r"^(CodecBzip2\.)?Bzip2Compressor\(blocksize100k=\d+, workfactor=\d+, verbosity=\d+\)$", sprint(show, codec))
     @test CodecBzip2.initialize(codec) === nothing
     @test CodecBzip2.finalize(codec) === nothing
 
     codec = Bzip2Decompressor()
     @test codec isa Bzip2Decompressor
-    @test ismatch(r"^CodecBzip2.Bzip2Decompressor\(small=(true|false), verbosity=\d+\)$", sprint(show, codec))
+    @test ismatch(r"^(CodecBzip2\.)?Bzip2Decompressor\(small=(true|false), verbosity=\d+\)$", sprint(show, codec))
     @test CodecBzip2.initialize(codec) === nothing
     @test CodecBzip2.finalize(codec) === nothing
 
