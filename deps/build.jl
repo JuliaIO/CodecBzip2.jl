@@ -2,7 +2,7 @@ using BinDeps
 @BinDeps.setup
 
 libbz2 = library_dependency("libbz2",aliases=["libbz2-1"])
-if is_windows()
+if Sys.iswindows()
 	using WinRPM
 	provides(WinRPM.RPM,"libbz2-1",libbz2,os = :Windows)
 end
