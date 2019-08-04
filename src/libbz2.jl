@@ -1,8 +1,7 @@
 # The libbz2 Interfaces
 # =====================
 
-include("../deps/deps.jl")
-const WIN32 = Sys.iswindows() && Sys.WORD_SIZE==32
+const WIN32 = Sys.iswindows() && Sys.WORD_SIZE == 32
 
 mutable struct BZStream
     next_in::Ptr{UInt8}
