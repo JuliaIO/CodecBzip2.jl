@@ -1,7 +1,7 @@
 # Decompressor Codec
 # ==================
 
-struct Bzip2Decompressor <: TranscodingStreams.Codec
+mutable struct Bzip2Decompressor <: TranscodingStreams.Codec
     stream::BZStream
     small::Bool
     verbosity::Int

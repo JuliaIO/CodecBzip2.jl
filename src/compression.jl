@@ -1,7 +1,7 @@
 # Compressor Codec
 # ================
 
-struct Bzip2Compressor <: TranscodingStreams.Codec
+mutable struct Bzip2Compressor <: TranscodingStreams.Codec
     stream::BZStream
     blocksize100k::Int
     workfactor::Int
