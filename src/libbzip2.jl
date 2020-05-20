@@ -4,15 +4,15 @@
 const WIN32 = Sys.iswindows() && Sys.WORD_SIZE == 32
 
 mutable struct BZStream
-    next_in::Ptr{UInt8}
-    avail_in::Cint
-    total_in_lo32::Cint
-    total_in_hi32::Cint
+    next_in::Ptr{Cchar}
+    avail_in::Cuint
+    total_in_lo32::Cuint
+    total_in_hi32::Cuint
 
-    next_out::Ptr{UInt8}
-    avail_out::Cint
-    total_out_lo32::Cint
-    total_out_hi32::Cint
+    next_out::Ptr{Cchar}
+    avail_out::Cuint
+    total_out_lo32::Cuint
+    total_out_hi32::Cuint
 
     state::Ptr{Cvoid}
 
