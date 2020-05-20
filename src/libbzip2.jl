@@ -21,7 +21,7 @@ mutable struct BZStream
     opaque::Ptr{Cvoid}
 end
 
-bzalloc(::Ptr{Cvoid}, n::Cint) = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), n)
+bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint) = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), m*n)
 bzfree(::Ptr{Cvoid}, p::Ptr{Cvoid}) = ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
 
 function BZStream()
@@ -29,7 +29,7 @@ function BZStream()
         C_NULL, 0, 0, 0,
         C_NULL, 0, 0, 0,
         C_NULL,
-        @cfunction(bzalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cint)),
+        @cfunction(bzalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cint, Cint)),
         @cfunction(bzfree, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})),
         C_NULL,
     )
