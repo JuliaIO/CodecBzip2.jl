@@ -29,8 +29,8 @@ function BZStream()
         C_NULL, 0, 0, 0,
         C_NULL, 0, 0, 0,
         C_NULL,
-        @cfunction(bzalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cint, Cint)),
-        @cfunction(bzfree, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})),
+        C_NULL, # @cfunction(bzalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cint, Cint)),
+        C_NULL, # @cfunction(bzfree, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})),
         C_NULL,
     )
 end
