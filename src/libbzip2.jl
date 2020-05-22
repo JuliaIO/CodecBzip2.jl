@@ -21,8 +21,15 @@ mutable struct BZStream
     opaque::Ptr{Cvoid}
 end
 
-bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint) = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), m*n)
-bzfree(::Ptr{Cvoid}, p::Ptr{Cvoid}) = ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
+function bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint)
+    p = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), m*n)
+    println("bzalloc($m, $n) => $p")
+    return p
+end
+function bzfree(::Ptr{Cvoid}, p::Ptr{Cvoid})
+    println("bzfree($p)")
+    ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
+end
 
 function BZStream()
     return BZStream(
@@ -64,6 +71,9 @@ function compress_init!(stream::BZStream,
                         blocksize100k::Integer,
                         verbosity::Integer,
                         workfactor::Integer)
+    print("compress_init!(")
+    show(objectid(stream))
+    println(")")
     if WIN32
         return ccall(
             ("BZ2_bzCompressInit@16", libbzip2),
@@ -81,6 +91,9 @@ function compress_init!(stream::BZStream,
 end
 
 function compress_end!(stream::BZStream)
+    print("compress_end!(")
+    show(objectid(stream))
+    println(")")
     if WIN32
         return ccall(
             ("BZ2_bzCompressEnd@4", libbzip2),
