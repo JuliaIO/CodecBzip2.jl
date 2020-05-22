@@ -4,15 +4,15 @@
 const WIN32 = Sys.iswindows() && Sys.WORD_SIZE == 32
 
 mutable struct BZStream
-    next_in::Ptr{UInt8}
-    avail_in::Cint
-    total_in_lo32::Cint
-    total_in_hi32::Cint
+    next_in::Ptr{Cchar}
+    avail_in::Cuint
+    total_in_lo32::Cuint
+    total_in_hi32::Cuint
 
-    next_out::Ptr{UInt8}
-    avail_out::Cint
-    total_out_lo32::Cint
-    total_out_hi32::Cint
+    next_out::Ptr{Cchar}
+    avail_out::Cuint
+    total_out_lo32::Cuint
+    total_out_hi32::Cuint
 
     state::Ptr{Cvoid}
 
@@ -21,12 +21,18 @@ mutable struct BZStream
     opaque::Ptr{Cvoid}
 end
 
+bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint) = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), m*n)
+bzfree(::Ptr{Cvoid}, p::Ptr{Cvoid}) = ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
+
 function BZStream()
     return BZStream(
         C_NULL, 0, 0, 0,
         C_NULL, 0, 0, 0,
         C_NULL,
-        C_NULL, C_NULL, C_NULL)
+        @cfunction(bzalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cint, Cint)),
+        @cfunction(bzfree, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})),
+        C_NULL,
+    )
 end
 
 # Action code
