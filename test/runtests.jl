@@ -1,4 +1,5 @@
 using CodecBzip2
+using Random
 if VERSION > v"0.7-"
     using Test
 else
