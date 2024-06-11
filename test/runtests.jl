@@ -38,6 +38,9 @@ import TranscodingStreams
     TranscodingStreams.test_roundtrip_read(Bzip2CompressorStream, Bzip2DecompressorStream)
     TranscodingStreams.test_roundtrip_write(Bzip2CompressorStream, Bzip2DecompressorStream)
     TranscodingStreams.test_roundtrip_lines(Bzip2CompressorStream, Bzip2DecompressorStream)
+    if isdefined(TranscodingStreams, :test_roundtrip_seekstart)
+        TranscodingStreams.test_roundtrip_seekstart(Bzip2CompressorStream, Bzip2DecompressorStream)
+    end
     TranscodingStreams.test_roundtrip_transcode(Bzip2Compressor, Bzip2Decompressor)
 
     @test_throws ArgumentError Bzip2Compressor(blocksize100k=10)
