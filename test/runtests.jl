@@ -1,11 +1,12 @@
 using CodecBzip2
-using Random
-if VERSION > v"0.7-"
-    using Test
-else
-    using Base.Test
-end
+using Test
 import TranscodingStreams
+using TestsForCodecPackages:
+    test_roundtrip_read,
+    test_roundtrip_write,
+    test_roundtrip_transcode,
+    test_roundtrip_lines,
+    test_roundtrip_seekstart
 
 @testset "Bzip2 Codec" begin
     codec = Bzip2Compressor()
@@ -35,13 +36,11 @@ import TranscodingStreams
     @test Bzip2CompressorStream <: TranscodingStreams.TranscodingStream
     @test Bzip2DecompressorStream <: TranscodingStreams.TranscodingStream
 
-    TranscodingStreams.test_roundtrip_read(Bzip2CompressorStream, Bzip2DecompressorStream)
-    TranscodingStreams.test_roundtrip_write(Bzip2CompressorStream, Bzip2DecompressorStream)
-    TranscodingStreams.test_roundtrip_lines(Bzip2CompressorStream, Bzip2DecompressorStream)
-    if isdefined(TranscodingStreams, :test_roundtrip_seekstart)
-        TranscodingStreams.test_roundtrip_seekstart(Bzip2CompressorStream, Bzip2DecompressorStream)
-    end
-    TranscodingStreams.test_roundtrip_transcode(Bzip2Compressor, Bzip2Decompressor)
+    test_roundtrip_read(Bzip2CompressorStream, Bzip2DecompressorStream)
+    test_roundtrip_write(Bzip2CompressorStream, Bzip2DecompressorStream)
+    test_roundtrip_lines(Bzip2CompressorStream, Bzip2DecompressorStream)
+    test_roundtrip_seekstart(Bzip2CompressorStream, Bzip2DecompressorStream)
+    test_roundtrip_transcode(Bzip2Compressor, Bzip2Decompressor)
 
     @test_throws ArgumentError Bzip2Compressor(blocksize100k=10)
     @test_throws ArgumentError Bzip2Compressor(workfactor=251)
