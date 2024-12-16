@@ -21,7 +21,14 @@ mutable struct BZStream
     opaque::Ptr{Cvoid}
 end
 
-bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint) = ccall(:jl_malloc, Ptr{Cvoid}, (Cint,), m*n)
+function bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint)::Ptr{Cvoid}
+    s, f = Base.Checked.mul_with_overflow(m, n)
+    if f || signbit(s)
+        C_NULL
+    else
+        ccall(:jl_malloc, Ptr{Cvoid}, (Csize_t,), s%Csize_t)
+    end
+end
 bzfree(::Ptr{Cvoid}, p::Ptr{Cvoid}) = ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
 
 function BZStream()
