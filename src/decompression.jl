@@ -54,11 +54,11 @@ function TranscodingStreams.finalize(codec::Bzip2Decompressor)
     return
 end
 
-function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error::Error)
+function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error_ref::Error)
     if codec.stream.state != C_NULL
         code = decompress_end!(codec.stream)
         if code != BZ_OK
-            error[] = BZ2Error(code)
+            error_ref[] = BZ2Error(code)
             return :error
         end
     end
@@ -77,7 +77,7 @@ function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error:
     end
 end
 
-function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, output::Memory, error::Error)
+function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, output::Memory, error_ref::Error)
     stream = codec.stream
     if stream.state == C_NULL
         error("startproc must be called before process")
@@ -93,7 +93,7 @@ function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, out
     Δout = Int(avail_out - stream.avail_out)
     if code == BZ_OK
         if iszero(input.size) && !iszero(stream.avail_out)
-            error[] = BZ2Error(BZ_UNEXPECTED_EOF)
+            error_ref[] = BZ2Error(BZ_UNEXPECTED_EOF)
             return Δin, Δout, :error
         else
             return Δin, Δout, :ok
@@ -103,7 +103,7 @@ function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, out
     elseif code == BZ_MEM_ERROR
         throw(OutOfMemoryError())
     else
-        error[] = BZ2Error(code)
+        error_ref[] = BZ2Error(code)
         return Δin, Δout, :error
     end
 end
