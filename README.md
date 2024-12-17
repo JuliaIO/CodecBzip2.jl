@@ -1,6 +1,7 @@
 # CodecBzip2.jl
 
-[![codecov.io][codecov-img]][codecov-url]
+[![CI](https://github.com/JuliaIO/CodecBzip2.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaIO/CodecBzip2.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/JuliaIO/CodecBzip2.jl/graph/badge.svg?token=eToD28jdA7)](https://codecov.io/gh/JuliaIO/CodecBzip2.jl)
 
 ## Installation
 
@@ -43,11 +44,4 @@ This package exports following codecs and streams:
 | `Bzip2Compressor`    | `Bzip2CompressorStream`    |
 | `Bzip2Decompressor`  | `Bzip2DecompressorStream`  |
 
-See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
-
-[travisci-img]: https://travis-ci.org/bicycle1885/CodecBzip2.jl.svg?branch=master
-[travisci-url]: https://travis-ci.org/bicycle1885/CodecBzip2.jl
-[appveyor-img]: https://ci.appveyor.com/api/projects/status/bqm4qh5cd13u70cm?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/bicycle1885/codecbzip2-jl
-[codecov-img]: http://codecov.io/github/bicycle1885/CodecBzip2.jl/coverage.svg?branch=master
-[codecov-url]: http://codecov.io/github/bicycle1885/CodecBzip2.jl?branch=master
+See docstrings and [TranscodingStreams.jl](https://github.com/JuliaIO/TranscodingStreams.jl) for details.
