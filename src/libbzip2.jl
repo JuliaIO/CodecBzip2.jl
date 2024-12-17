@@ -186,7 +186,29 @@ struct BZ2Error <: Exception
     code::Cint
 end
 
-function bzerror(stream::BZStream, code::Cint)
+function Base.showerror(io::IO, err::BZ2Error)
+    code = err.code
+    print(io, "BZ2Error: ")
+    if code == BZ_CONFIG_ERROR
+        print(io, "BZ_CONFIG_ERROR: the library has been improperly compiled on your platform")
+    elseif code == BZ_SEQUENCE_ERROR
+        print(io, "BZ_SEQUENCE_ERROR: invalid function sequence, there is a bug in CodecBzip2")
+    elseif code == BZ_PARAM_ERROR
+        print(io, "BZ_PARAM_ERROR: function parameter is out of range, there is a bug in CodecBzip2")
+    elseif code == BZ_DATA_ERROR
+        print(io, "BZ_DATA_ERROR: a data integrity error is detected in the compressed stream")
+    elseif code == BZ_DATA_ERROR_MAGIC
+        print(io, "BZ_DATA_ERROR_MAGIC: the compressed stream doesn't begin with the right magic bytes")
+    elseif code == BZ_UNEXPECTED_EOF
+        print(io, "BZ_UNEXPECTED_EOF: the compressed stream may be truncated")
+    else
+        print(io, "unknown bzip2 error code: ")
+        print(io, code)
+    end
+    nothing
+end
+
+function bzerror(code::Cint)
     @assert code < 0
     throw(BZ2Error(code))
 end
