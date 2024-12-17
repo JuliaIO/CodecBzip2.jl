@@ -1,12 +1,16 @@
 using CodecBzip2
 using Test
+using Aqua: Aqua
 import TranscodingStreams
 using TestsForCodecPackages:
     test_roundtrip_read,
     test_roundtrip_write,
     test_roundtrip_transcode,
     test_roundtrip_lines,
-    test_roundtrip_seekstart
+    test_roundtrip_seekstart,
+    test_reuse_encoder
+
+Aqua.test_all(CodecBzip2)
 
 @testset "Bzip2 Codec" begin
     codec = Bzip2Compressor()
@@ -41,9 +45,45 @@ using TestsForCodecPackages:
     test_roundtrip_lines(Bzip2CompressorStream, Bzip2DecompressorStream)
     test_roundtrip_seekstart(Bzip2CompressorStream, Bzip2DecompressorStream)
     test_roundtrip_transcode(Bzip2Compressor, Bzip2Decompressor)
+    test_reuse_encoder(Bzip2Compressor, Bzip2Decompressor)
 
     @test_throws ArgumentError Bzip2Compressor(blocksize100k=10)
     @test_throws ArgumentError Bzip2Compressor(workfactor=251)
     @test_throws ArgumentError Bzip2Compressor(verbosity=5)
     @test_throws ArgumentError Bzip2Decompressor(verbosity=5)
+
+    @testset "unexpected end of stream errors" begin
+        # issue #32
+        local uncompressed = rand(UInt8, 1000)
+        local compressed = transcode(Bzip2Compressor, uncompressed)
+        for i in 0:length(compressed)-1
+            @test_throws CodecBzip2.BZ2Error(CodecBzip2.BZ_UNEXPECTED_EOF) transcode(Bzip2Decompressor, compressed[1:i])
+        end
+        @test transcode(Bzip2Decompressor, compressed) == uncompressed
+        # compressing empty vector should still work
+        @test transcode(Bzip2Decompressor, transcode(Bzip2Compressor, UInt8[])) == UInt8[]
+    end
+    @testset "data errors" begin
+        @test_throws CodecBzip2.BZ2Error(CodecBzip2.BZ_DATA_ERROR_MAGIC) transcode(Bzip2Decompressor, zeros(UInt8, 10))
+        local uncompressed = rand(UInt8, 1000)
+        local compressed = transcode(Bzip2Compressor, uncompressed)
+        compressed[70] ⊻= 0x01
+        @test_throws CodecBzip2.BZ2Error(CodecBzip2.BZ_DATA_ERROR) transcode(Bzip2Decompressor, compressed)
+    end
+    @testset "error printing" begin
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_CONFIG_ERROR)) ==
+            "BZ2Error: BZ_CONFIG_ERROR: the library has been improperly compiled on your platform"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_SEQUENCE_ERROR)) ==
+            "BZ2Error: BZ_SEQUENCE_ERROR: invalid function sequence, there is a bug in CodecBzip2"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_PARAM_ERROR)) ==
+            "BZ2Error: BZ_PARAM_ERROR: function parameter is out of range, there is a bug in CodecBzip2"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_UNEXPECTED_EOF)) ==
+            "BZ2Error: BZ_UNEXPECTED_EOF: the compressed stream may be truncated"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_DATA_ERROR)) ==
+            "BZ2Error: BZ_DATA_ERROR: a data integrity error is detected in the compressed stream"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(CodecBzip2.BZ_DATA_ERROR_MAGIC)) ==
+            "BZ2Error: BZ_DATA_ERROR_MAGIC: the compressed stream doesn't begin with the right magic bytes"
+        @test sprint(Base.showerror, CodecBzip2.BZ2Error(-100)) ==
+            "BZ2Error: unknown bzip2 error code: -100"
+    end
 end
