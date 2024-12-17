@@ -76,7 +76,7 @@ function TranscodingStreams.process(codec::Bzip2Decompressor, input::Memory, out
     stream.avail_in = input.size
     stream.next_out = output.ptr
     stream.avail_out = output.size
-    code = decompress!(stream)
+    code = _decompress!(stream)
     Δin = Int(input.size - stream.avail_in)
     Δout = Int(output.size - stream.avail_out)
     if code == BZ_OK

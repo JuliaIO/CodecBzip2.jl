@@ -161,7 +161,7 @@ function decompress_end!(stream::BZStream)
     end
 end
 
-function decompress!(stream::BZStream)
+function _decompress!(stream::BZStream)
     if WIN32
         return ccall(
             ("BZ2_bzDecompress@4", libbzip2),
