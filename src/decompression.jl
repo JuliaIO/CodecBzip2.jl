@@ -14,7 +14,7 @@ function decompressor_ctx_finalizer!(ctx::DecompressorContext)
     # The atomic variable is needed because this may be called
     # with both finalizer and TranscodingStreams.finalize
     # and TranscodingStreams.finalize might get called in other finalizers
-    if @atomicswap ctx.is_ready = false
+    if @atomicswap(ctx.is_ready = false)
         decompress_end!(ctx.stream)
     end
     return
@@ -73,6 +73,7 @@ function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error_
     ctx = codec.ctx
     GC.@preserve ctx begin
         decompressor_ctx_finalizer!(ctx)
+        @atomic ctx.is_ready = true
         code = decompress_init!(ctx.stream, codec.verbosity, codec.small)
         # errors in decompress_init! do not require clean up, so just throw
         if code == BZ_OK

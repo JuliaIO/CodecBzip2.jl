@@ -14,7 +14,7 @@ function compressor_ctx_finalizer!(ctx::CompressorContext)
     # The atomic variable is needed because this may be called
     # with both finalizer and TranscodingStreams.finalize
     # and TranscodingStreams.finalize might get called in other finalizers
-    if @atomicswap ctx.is_ready = false
+    if @atomicswap(ctx.is_ready = false)
         compress_end!(ctx.stream)
     end
     return
@@ -85,6 +85,7 @@ function TranscodingStreams.startproc(codec::Bzip2Compressor, ::Symbol, error_re
     ctx = codec.ctx
     GC.@preserve ctx begin
         compressor_ctx_finalizer!(ctx)
+        @atomic ctx.is_ready = true
         code = compress_init!(ctx.stream, codec.blocksize100k, codec.verbosity, codec.workfactor)
         # errors in compress_init! do not require clean up, so just throw
         if code == BZ_OK
