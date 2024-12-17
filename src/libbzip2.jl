@@ -21,6 +21,8 @@ mutable struct BZStream
     opaque::Ptr{Cvoid}
 end
 
+@assert typemax(Csize_t) ≥ typemax(Cint)
+
 function bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint)::Ptr{Cvoid}
     s, f = Base.Checked.mul_with_overflow(m, n)
     if f || signbit(s)
