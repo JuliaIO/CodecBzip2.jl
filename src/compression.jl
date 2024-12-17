@@ -1,7 +1,7 @@
 # Compressor Codec
 # ================
 
-mutable struct Bzip2Compressor <: TranscodingStreams.Codec
+struct Bzip2Compressor <: TranscodingStreams.Codec
     stream::BZStream
     blocksize100k::Int
     workfactor::Int
@@ -37,7 +37,9 @@ function Bzip2Compressor(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
     elseif !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    return Bzip2Compressor(BZStream(), blocksize100k, workfactor, verbosity)
+    stream = BZStream()
+    finalizer(compress_finalizer!, stream)
+    return Bzip2Compressor(stream, blocksize100k, workfactor, verbosity)
 end
 
 const Bzip2CompressorStream{S} = TranscodingStream{Bzip2Compressor,S} where S<:IO
@@ -56,23 +58,10 @@ end
 # Methods
 # -------
 
-function TranscodingStreams.finalize(codec::Bzip2Compressor)
-    if codec.stream.state != C_NULL
-        code = compress_end!(codec.stream)
-        if code != BZ_OK
-            bzerror(code)
-        end
-    end
-    return
-end
-
 function TranscodingStreams.startproc(codec::Bzip2Compressor, ::Symbol, error_ref::Error)
     if codec.stream.state != C_NULL
         code = compress_end!(codec.stream)
-        if code != BZ_OK
-            error_ref[] = BZ2Error(code)
-            return :error
-        end
+        @assert code == BZ_OK
     end
     code = compress_init!(codec.stream, codec.blocksize100k, codec.verbosity, codec.workfactor)
     # errors in compress_init! do not require clean up, so just throw

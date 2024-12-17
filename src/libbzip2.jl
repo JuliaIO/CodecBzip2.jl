@@ -106,6 +106,11 @@ function compress_end!(stream::BZStream)
     end
 end
 
+function compress_finalizer!(stream::BZStream)
+    compress_end!(stream)
+    nothing
+end
+
 function compress!(stream::BZStream, action::Integer)
     if WIN32
         return ccall(
@@ -159,6 +164,11 @@ function decompress_end!(stream::BZStream)
             (Ref{BZStream},),
             stream)
     end
+end
+
+function decompress_finalizer!(stream::BZStream)
+    decompress_end!(stream)
+    nothing
 end
 
 function decompress!(stream::BZStream)
