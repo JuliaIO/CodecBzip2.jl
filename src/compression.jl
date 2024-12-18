@@ -26,6 +26,9 @@ Arguments
 - `blocksize100k`: block size to be use for compression (1..9)
 - `workfactor`: amount of effort the standard algorithm will expend before resorting to the fallback (0..250)
 - `verbosity`: verbosity level (0..4)
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
 """
 function Bzip2Compressor(;blocksize100k::Integer=DEFAULT_BLOCKSIZE100K,
                            workfactor::Integer=DEFAULT_WORKFACTOR,
@@ -48,6 +51,9 @@ const Bzip2CompressorStream{S} = TranscodingStream{Bzip2Compressor,S} where S<:I
     Bzip2CompressorStream(stream::IO; kwargs...)
 
 Create a bzip2 compression stream (see `Bzip2Compressor` for `kwargs`).
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this stream due to stored raw pointers.
 """
 function Bzip2CompressorStream(stream::IO; kwargs...)
     x, y = splitkwargs(kwargs, (:blocksize100k, :workfactor, :verbosity))
