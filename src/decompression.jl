@@ -1,7 +1,7 @@
 # Decompressor Codec
 # ==================
 
-mutable struct Bzip2Decompressor <: TranscodingStreams.Codec
+struct Bzip2Decompressor <: TranscodingStreams.Codec
     stream::BZStream
     small::Bool
     verbosity::Int
@@ -25,7 +25,9 @@ function Bzip2Decompressor(;small::Bool=false, verbosity::Integer=DEFAULT_VERBOS
     if !(0 ≤ verbosity ≤ 4)
         throw(ArgumentError("verbosity must be within 0..4"))
     end
-    return Bzip2Decompressor(BZStream(), small, verbosity)
+    stream = BZStream()
+    finalizer(decompress_finalizer!, stream)
+    return Bzip2Decompressor(stream, small, verbosity)
 end
 
 const Bzip2DecompressorStream{S} = TranscodingStream{Bzip2Decompressor,S} where S<:IO
@@ -44,23 +46,10 @@ end
 # Methods
 # -------
 
-function TranscodingStreams.finalize(codec::Bzip2Decompressor)
-    if codec.stream.state != C_NULL
-        code = decompress_end!(codec.stream)
-        if code != BZ_OK
-            bzerror(code)
-        end
-    end
-    return
-end
-
 function TranscodingStreams.startproc(codec::Bzip2Decompressor, ::Symbol, error_ref::Error)
     if codec.stream.state != C_NULL
         code = decompress_end!(codec.stream)
-        if code != BZ_OK
-            error_ref[] = BZ2Error(code)
-            return :error
-        end
+        @assert code == BZ_OK
     end
     code = decompress_init!(codec.stream, codec.verbosity, codec.small)
     # errors in decompress_init! do not require clean up, so just throw

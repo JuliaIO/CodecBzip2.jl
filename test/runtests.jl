@@ -86,4 +86,11 @@ Aqua.test_all(CodecBzip2)
         @test sprint(Base.showerror, CodecBzip2.BZ2Error(-100)) ==
             "BZ2Error: unknown bzip2 error code: -100"
     end
+    @testset "memory leaks" begin
+        # issue #27
+        for i in 1:200000
+            c = transcode(Bzip2Compressor(), zeros(UInt8,16))
+            u = transcode(Bzip2Decompressor(), c)
+        end
+    end
 end

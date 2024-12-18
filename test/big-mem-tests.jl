@@ -6,6 +6,16 @@
 using Test
 using CodecBzip2
 
+@testset "memory leak" begin
+    function foo()
+        for i in 1:1000000
+            c = transcode(Bzip2Compressor(), zeros(UInt8,16))
+            u = transcode(Bzip2Decompressor(), c)
+        end
+    end
+    foo()
+end
+
 @testset "Big Memory Tests" begin
     Sys.WORD_SIZE == 64 || error("tests require 64 bit word size")
     @info "compressing zeros"
