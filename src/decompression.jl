@@ -20,6 +20,9 @@ Arguments
 ---------
 - `small`: flag to activate an algorithm which uses less memory
 - `verbosity`: verbosity level (0..4)
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
 """
 function Bzip2Decompressor(;small::Bool=false, verbosity::Integer=DEFAULT_VERBOSITY)
     if !(0 ≤ verbosity ≤ 4)
@@ -36,6 +39,9 @@ const Bzip2DecompressorStream{S} = TranscodingStream{Bzip2Decompressor,S} where 
     Bzip2DecompressorStream(stream::IO; kwargs...)
 
 Create a bzip2 decompression stream (see `Bzip2Decompressor` for `kwargs`).
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this stream due to stored raw pointers.
 """
 function Bzip2DecompressorStream(stream::IO; kwargs...)
     x, y = splitkwargs(kwargs, (:small, :verbosity))
